@@ -372,7 +372,7 @@
       if (ua.includes('Edg')) return 'Edge'; // Modern Edge uses 'Edg'
       if (ua.includes('Chrome')) return 'Chrome';
       if (ua.includes('Firefox')) return 'Firefox';
-      if (ua.includes('Safari')) return 'Safari';
+      if (ua.includes('Safari') && !ua.includes('Chrome')) return 'Safari'; // Safari check after Chrome
       return 'Unknown';
     }
 
@@ -452,11 +452,12 @@
       // Get HTML from already rendered preview
       const container = document.getElementById('signature-preview');
       const html = container.innerHTML;
+      const text = container.textContent || container.innerText; // Extract plain text
 
       try {
         // Primary method: ClipboardItem API with both HTML and plain text
         const htmlBlob = new Blob([html], { type: 'text/html' });
-        const textBlob = new Blob([html], { type: 'text/plain' });
+        const textBlob = new Blob([text], { type: 'text/plain' });
         const data = [new ClipboardItem({
           'text/html': htmlBlob,
           'text/plain': textBlob
