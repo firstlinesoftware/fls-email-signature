@@ -368,10 +368,11 @@
     // Helper function to get safe browser info
     function getBrowserInfo() {
       const ua = navigator.userAgent;
+      // Check more specific browsers first
+      if (ua.includes('Edg')) return 'Edge'; // Modern Edge uses 'Edg'
       if (ua.includes('Chrome')) return 'Chrome';
       if (ua.includes('Firefox')) return 'Firefox';
       if (ua.includes('Safari')) return 'Safari';
-      if (ua.includes('Edge')) return 'Edge';
       return 'Unknown';
     }
 
