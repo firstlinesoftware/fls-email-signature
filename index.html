@@ -170,6 +170,23 @@
       background: #22c55e;
     }
 
+    .btn-primary.error {
+      background: #ef4444;
+    }
+
+    .error-toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #ef4444;
+      color: white;
+      padding: 16px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      max-width: 300px;
+    }
+
     .btn-icon {
       display: inline-flex;
       align-items: center;
@@ -333,6 +350,31 @@
     const btnThemeToggle = document.getElementById('btn-theme-toggle');
     const iconSun = document.getElementById('icon-sun');
     const iconMoon = document.getElementById('icon-moon');
+    const previewCard = document.querySelector('.preview-card');
+
+    // SVG icon constants
+    const SVG_COPY_ICON = '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
+    const SVG_CHECK_ICON = '<polyline points="20 6 9 17 4 12"></polyline>';
+    const SVG_X_ICON = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>';
+
+    // Timing constants
+    const ERROR_DISPLAY_DURATION = 5000; // milliseconds
+
+    // State variables
+    let isDarkMode = false;
+    let errorTimeout = null;
+    let currentErrorDiv = null;
+
+    // Helper function to get safe browser info
+    function getBrowserInfo() {
+      const ua = navigator.userAgent;
+      // Check more specific browsers first
+      if (ua.includes('Edg')) return 'Edge'; // Modern Edge uses 'Edg'
+      if (ua.includes('Chrome')) return 'Chrome';
+      if (ua.includes('Firefox')) return 'Firefox';
+      if (ua.includes('Safari') && !ua.includes('Chrome')) return 'Safari'; // Safari check after Chrome
+      return 'Unknown';
+    }
 
     // Generate signature HTML
     function generateSignature() {
@@ -410,18 +452,21 @@
       // Get HTML from already rendered preview
       const container = document.getElementById('signature-preview');
       const html = container.innerHTML;
+      const text = container.textContent || container.innerText; // Extract plain text
 
       try {
         // Primary method: ClipboardItem API with both HTML and plain text
         const htmlBlob = new Blob([html], { type: 'text/html' });
-        const textBlob = new Blob([html], { type: 'text/plain' });
+        const textBlob = new Blob([text], { type: 'text/plain' });
         const data = [new ClipboardItem({
           'text/html': htmlBlob,
           'text/plain': textBlob
         })];
         await navigator.clipboard.write(data);
+        console.log('Signature copied successfully using Clipboard API');
         showCopySuccess();
       } catch (err) {
+        console.warn('Clipboard API failed, attempting fallback method:', err.message);
         // Fallback for Firefox: execCommand
         try {
           const tempContainer = document.createElement('div');
@@ -441,9 +486,15 @@
           document.body.removeChild(tempContainer);
           selection.removeAllRanges();
 
+          console.log('Signature copied successfully using execCommand fallback');
           showCopySuccess();
         } catch (fallbackErr) {
-          alert('Failed to copy. Please try using Chrome, Edge, or Safari.');
+          console.error('All copy methods failed:', {
+            primaryError: err.message,
+            fallbackError: fallbackErr.message,
+            browser: getBrowserInfo()
+          });
+          showCopyError('Unable to copy signature. Please try manually selecting and copying the text.');
         }
       }
     }
@@ -452,18 +503,52 @@
       const span = copyBtn.querySelector('span');
       const svg = copyBtn.querySelector('svg');
       span.textContent = 'Copied!';
-      svg.innerHTML = '<polyline points="20 6 9 17 4 12"></polyline>'; // Checkmark
+      svg.innerHTML = SVG_CHECK_ICON;
       copyBtn.classList.add('success');
       setTimeout(() => {
         span.textContent = 'Copy Signature';
-        svg.innerHTML = '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
+        svg.innerHTML = SVG_COPY_ICON;
         copyBtn.classList.remove('success');
       }, 2000);
     }
 
+    function showCopyError(message) {
+      const span = copyBtn.querySelector('span');
+      const svg = copyBtn.querySelector('svg');
+      
+      // Clear any existing error timeout and remove previous error div
+      if (errorTimeout) {
+        clearTimeout(errorTimeout);
+        errorTimeout = null;
+      }
+      if (currentErrorDiv) {
+        currentErrorDiv.remove();
+        currentErrorDiv = null;
+      }
+      
+      span.textContent = 'Copy Failed';
+      svg.innerHTML = SVG_X_ICON;
+      copyBtn.classList.add('error');
+      
+      // Show error message to user
+      currentErrorDiv = document.createElement('div');
+      currentErrorDiv.className = 'error-toast';
+      currentErrorDiv.textContent = message;
+      document.body.appendChild(currentErrorDiv);
+      
+      errorTimeout = setTimeout(() => {
+        span.textContent = 'Copy Signature';
+        svg.innerHTML = SVG_COPY_ICON;
+        copyBtn.classList.remove('error');
+        if (currentErrorDiv) {
+          currentErrorDiv.remove();
+          currentErrorDiv = null;
+        }
+        errorTimeout = null;
+      }, ERROR_DISPLAY_DURATION);
+    }
+
     // Dark mode toggle
-    const previewCard = document.querySelector('.preview-card');
-    let isDarkMode = false;
 
     function toggleTheme() {
       isDarkMode = !isDarkMode;
