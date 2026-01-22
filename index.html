@@ -476,27 +476,44 @@
     function showCopyError(message) {
       const span = copyBtn.querySelector('span');
       const svg = copyBtn.querySelector('svg');
+      
+      // Clear any existing error timeout and remove previous error div
+      if (errorTimeout) {
+        clearTimeout(errorTimeout);
+        errorTimeout = null;
+      }
+      if (currentErrorDiv && currentErrorDiv.parentNode) {
+        document.body.removeChild(currentErrorDiv);
+        currentErrorDiv = null;
+      }
+      
       span.textContent = 'Copy Failed';
       svg.innerHTML = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>'; // X mark
       copyBtn.classList.add('error');
       
       // Show error message to user
-      const errorDiv = document.createElement('div');
-      errorDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #ef4444; color: white; padding: 16px 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; max-width: 300px;';
-      errorDiv.textContent = message;
-      document.body.appendChild(errorDiv);
+      currentErrorDiv = document.createElement('div');
+      currentErrorDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #ef4444; color: white; padding: 16px 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; max-width: 300px;';
+      currentErrorDiv.textContent = message;
+      document.body.appendChild(currentErrorDiv);
       
-      setTimeout(() => {
+      errorTimeout = setTimeout(() => {
         span.textContent = 'Copy Signature';
         svg.innerHTML = '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
         copyBtn.classList.remove('error');
-        document.body.removeChild(errorDiv);
+        if (currentErrorDiv && currentErrorDiv.parentNode) {
+          document.body.removeChild(currentErrorDiv);
+          currentErrorDiv = null;
+        }
+        errorTimeout = null;
       }, 5000);
     }
 
     // Dark mode toggle
     const previewCard = document.querySelector('.preview-card');
     let isDarkMode = false;
+    let errorTimeout = null;
+    let currentErrorDiv = null;
 
     function toggleTheme() {
       isDarkMode = !isDarkMode;
