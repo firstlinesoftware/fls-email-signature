@@ -352,6 +352,11 @@
     const iconMoon = document.getElementById('icon-moon');
     const previewCard = document.querySelector('.preview-card');
 
+    // SVG icon constants
+    const SVG_COPY_ICON = '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
+    const SVG_CHECK_ICON = '<polyline points="20 6 9 17 4 12"></polyline>';
+    const SVG_X_ICON = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>';
+
     // State variables
     let isDarkMode = false;
     let errorTimeout = null;
@@ -483,11 +488,11 @@
       const span = copyBtn.querySelector('span');
       const svg = copyBtn.querySelector('svg');
       span.textContent = 'Copied!';
-      svg.innerHTML = '<polyline points="20 6 9 17 4 12"></polyline>'; // Checkmark
+      svg.innerHTML = SVG_CHECK_ICON;
       copyBtn.classList.add('success');
       setTimeout(() => {
         span.textContent = 'Copy Signature';
-        svg.innerHTML = '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
+        svg.innerHTML = SVG_COPY_ICON;
         copyBtn.classList.remove('success');
       }, 2000);
     }
@@ -502,12 +507,12 @@
         errorTimeout = null;
       }
       if (currentErrorDiv && currentErrorDiv.parentNode) {
-        document.body.removeChild(currentErrorDiv);
+        currentErrorDiv.remove();
         currentErrorDiv = null;
       }
       
       span.textContent = 'Copy Failed';
-      svg.innerHTML = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>'; // X mark
+      svg.innerHTML = SVG_X_ICON;
       copyBtn.classList.add('error');
       
       // Show error message to user
@@ -518,10 +523,10 @@
       
       errorTimeout = setTimeout(() => {
         span.textContent = 'Copy Signature';
-        svg.innerHTML = '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
+        svg.innerHTML = SVG_COPY_ICON;
         copyBtn.classList.remove('error');
         if (currentErrorDiv && currentErrorDiv.parentNode) {
-          document.body.removeChild(currentErrorDiv);
+          currentErrorDiv.remove();
           currentErrorDiv = null;
         }
         errorTimeout = null;
