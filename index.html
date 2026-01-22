@@ -357,10 +357,23 @@
     const SVG_CHECK_ICON = '<polyline points="20 6 9 17 4 12"></polyline>';
     const SVG_X_ICON = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>';
 
+    // Timing constants
+    const ERROR_DISPLAY_DURATION = 5000; // milliseconds
+
     // State variables
     let isDarkMode = false;
     let errorTimeout = null;
     let currentErrorDiv = null;
+
+    // Helper function to get safe browser info
+    function getBrowserInfo() {
+      const ua = navigator.userAgent;
+      if (ua.includes('Chrome')) return 'Chrome';
+      if (ua.includes('Firefox')) return 'Firefox';
+      if (ua.includes('Safari')) return 'Safari';
+      if (ua.includes('Edge')) return 'Edge';
+      return 'Unknown';
+    }
 
     // Generate signature HTML
     function generateSignature() {
@@ -477,7 +490,7 @@
           console.error('All copy methods failed:', {
             primaryError: err.message,
             fallbackError: fallbackErr.message,
-            userAgent: navigator.userAgent
+            browser: getBrowserInfo()
           });
           showCopyError('Unable to copy signature. Please try manually selecting and copying the text.');
         }
@@ -530,7 +543,7 @@
           currentErrorDiv = null;
         }
         errorTimeout = null;
-      }, 5000);
+      }, ERROR_DISPLAY_DURATION);
     }
 
     // Dark mode toggle
