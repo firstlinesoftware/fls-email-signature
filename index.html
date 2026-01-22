@@ -407,32 +407,38 @@
 
     // Copy to clipboard
     async function copySignature() {
-      const html = generateSignature();
+      // Get HTML from already rendered preview
+      const container = document.getElementById('signature-preview');
+      const html = container.innerHTML;
 
       try {
-        // Primary method: ClipboardItem API
-        const blob = new Blob([html], { type: 'text/html' });
-        const item = new ClipboardItem({ 'text/html': blob });
-        await navigator.clipboard.write([item]);
+        // Primary method: ClipboardItem API with both HTML and plain text
+        const htmlBlob = new Blob([html], { type: 'text/html' });
+        const textBlob = new Blob([html], { type: 'text/plain' });
+        const data = [new ClipboardItem({
+          'text/html': htmlBlob,
+          'text/plain': textBlob
+        })];
+        await navigator.clipboard.write(data);
         showCopySuccess();
       } catch (err) {
         // Fallback for Firefox: execCommand
         try {
-          const container = document.createElement('div');
-          container.innerHTML = html;
-          container.style.position = 'fixed';
-          container.style.left = '-9999px';
-          container.contentEditable = 'true';
-          document.body.appendChild(container);
+          const tempContainer = document.createElement('div');
+          tempContainer.innerHTML = html;
+          tempContainer.style.position = 'fixed';
+          tempContainer.style.left = '-9999px';
+          tempContainer.contentEditable = 'true';
+          document.body.appendChild(tempContainer);
 
           const range = document.createRange();
-          range.selectNodeContents(container);
+          range.selectNodeContents(tempContainer);
           const selection = window.getSelection();
           selection.removeAllRanges();
           selection.addRange(range);
 
           document.execCommand('copy');
-          document.body.removeChild(container);
+          document.body.removeChild(tempContainer);
           selection.removeAllRanges();
 
           showCopySuccess();
