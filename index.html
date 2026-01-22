@@ -506,7 +506,7 @@
         clearTimeout(errorTimeout);
         errorTimeout = null;
       }
-      if (currentErrorDiv && currentErrorDiv.parentNode) {
+      if (currentErrorDiv) {
         currentErrorDiv.remove();
         currentErrorDiv = null;
       }
@@ -525,7 +525,7 @@
         span.textContent = 'Copy Signature';
         svg.innerHTML = SVG_COPY_ICON;
         copyBtn.classList.remove('error');
-        if (currentErrorDiv && currentErrorDiv.parentNode) {
+        if (currentErrorDiv) {
           currentErrorDiv.remove();
           currentErrorDiv = null;
         }
