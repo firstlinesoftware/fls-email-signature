@@ -114,12 +114,24 @@ test.describe('FLS Email Signature Generator', () => {
     // Check for phone number
     await expect(preview).toContainText('+1 877 737 7178');
     
-    // Check for images (logo and social icons)
-    const images = page.locator('#signature-preview img');
-    const imageCount = await images.count();
+    // Check for specific images by alt text
+    const logo = preview.locator('img[alt="First Line Software"]');
+    await expect(logo).toBeVisible();
     
-    // Should have logo (1) + social icons (5) = 6 images
-    expect(imageCount).toBeGreaterThanOrEqual(6);
+    const websiteIcon = preview.locator('img[alt="Website"]');
+    await expect(websiteIcon).toBeVisible();
+    
+    const linkedInIcon = preview.locator('img[alt="LinkedIn"]');
+    await expect(linkedInIcon).toBeVisible();
+    
+    const instagramIcon = preview.locator('img[alt="Instagram"]');
+    await expect(instagramIcon).toBeVisible();
+    
+    const youtubeIcon = preview.locator('img[alt="YouTube"]');
+    await expect(youtubeIcon).toBeVisible();
+    
+    const podcastIcon = preview.locator('img[alt="Podcasts"]');
+    await expect(podcastIcon).toBeVisible();
   });
 
   test('should have all social media links', async ({ page }) => {
