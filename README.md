@@ -2,39 +2,59 @@
 
 Generate email signatures for First Line Software employees.
 
-## Usage
+## Development
 
-1. Open `index.html` in browser (or via `python3 -m http.server 8000`)
+This project uses Express.js for local development and Playwright for automated testing across multiple browsers.
+
+### Setup
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Copy the environment file and configure if needed:
+```bash
+cp .env.example .env
+```
+
+3. Install Playwright browsers:
+```bash
+npx playwright install
+```
+
+For WebKit support on Linux, install system dependencies:
+```bash
+sudo apt-get install libevent-2.1-7t64 libgstreamer-plugins-bad1.0-0 libavif16
+# Or install all dependencies automatically:
+sudo npx playwright install-deps
+```
+
+### Running the Development Server
+
+```bash
+npm start
+```
+
+The server will start on `http://localhost:3002` (configurable via `.env` file).
+
+### Running Tests
+
+Tests run on three browsers: **Chromium**, **Firefox**, and **WebKit** (Safari).
+
+```bash
+npm test              # Run all tests in headless mode
+npm run test:ui       # Run tests with Playwright UI
+npm run test:headed   # Run tests in headed mode (see browser windows)
+```
+
+### Usage
+
+1. Open `http://localhost:3002` in your browser (or deploy to production)
 2. Enter your name and job title
 3. Click "Copy Signature"
 4. Paste into Gmail settings
 
-## Development
+## Production
 
-### Running the Express Server
-
-```bash
-npm install
-npm start
-```
-
-The server will start on `http://localhost:3000`
-
-### Running Tests
-
-```bash
-npm test              # Run tests in headless mode
-npm run test:ui       # Run tests with UI
-npm run test:headed   # Run tests in headed mode
-```
-
-Before running tests, make sure to install Playwright browsers:
-```bash
-npx playwright install chromium
-```
-
-## Setup GitHub Pages
-
-1. Push to GitHub
-2. Settings → Pages → Source: main branch
-3. Update `GITHUB_BASE_URL` in `index.html` with your Pages URL
+The application is hosted on GitHub Pages. The static `index.html` file works standalone without the Express server in production.
