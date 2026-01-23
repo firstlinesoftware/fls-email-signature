@@ -25,8 +25,6 @@ npx playwright install
 
 For WebKit support on Linux, install system dependencies:
 ```bash
-sudo apt-get install libevent-2.1-7t64 libgstreamer-plugins-bad1.0-0 libavif16
-# Or install all dependencies automatically:
 sudo npx playwright install-deps
 ```
 

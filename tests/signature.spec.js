@@ -236,7 +236,9 @@ test.describe('FLS Email Signature Generator', () => {
     await page.locator('#in-job').fill('Senior Developer');
 
     await page.locator('#btn-copy').click();
-    await page.waitForTimeout(500);
+
+    // Wait for the success indicator instead of using a fixed timeout
+    await expect(page.locator('#btn-copy')).toContainText('Copied!');
 
     const clipboardContent = await strategy.readClipboard();
     strategy.verify(clipboardContent);

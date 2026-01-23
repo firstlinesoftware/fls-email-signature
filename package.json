@@ -2,7 +2,7 @@
   "name": "fls-email-signature",
   "version": "1.0.0",
   "description": "Generate email signatures for First Line Software employees.",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "test": "playwright test",
