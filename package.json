@@ -1,0 +1,22 @@
+{
+  "name": "fls-email-signature",
+  "version": "1.0.0",
+  "description": "Generate email signatures for First Line Software employees.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.0"
+  }
+}
