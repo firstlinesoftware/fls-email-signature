@@ -136,20 +136,109 @@ test.describe('FLS Email Signature Generator', () => {
 
   test('should have all social media links', async ({ page }) => {
     await page.goto('/');
-    
+
     const preview = page.locator('#signature-preview');
-    
+
     // Check for social media links
     const websiteLink = preview.locator('a[href="https://firstlinesoftware.com"]');
     const linkedInLink = preview.locator('a[href="https://www.linkedin.com/company/first-line-software-inc/mycompany/"]');
     const instagramLink = preview.locator('a[href="https://www.instagram.com/firstlinesoftware/"]');
     const youtubeLink = preview.locator('a[href="https://www.youtube.com/@fls_fam"]');
     const podcastLink = preview.locator('a[href="https://podcasts.apple.com/cz/podcast/spam-jam-by-first-line-software/id1761346338"]');
-    
+
     await expect(websiteLink).toBeVisible();
     await expect(linkedInLink).toBeVisible();
     await expect(instagramLink).toBeVisible();
     await expect(youtubeLink).toBeVisible();
     await expect(podcastLink).toBeVisible();
+  });
+
+  test('should copy signature to clipboard', async ({ page, context, browserName }) => {
+    const clipboardStrategies = {
+      chromium: {
+        async grantPermissions() {
+          await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+        },
+        async readClipboard() {
+          return await page.evaluate(async () => {
+            const clipboardData = await navigator.clipboard.read();
+            const htmlBlob = await clipboardData[0].getType('text/html');
+            return await htmlBlob.text();
+          });
+        },
+        verify(content) {
+          expect(content).toContain('Alice Johnson');
+          expect(content).toContain('Senior Developer');
+          expect(content).toContain('First Line Software');
+          expect(content).toContain('+1 877 737 7178');
+          expect(content).toContain('firstlinesoftware.com');
+        }
+      },
+      webkit: {
+        async grantPermissions() {
+          // Mock clipboard API for WebKit to capture what was written
+          await page.addInitScript(() => {
+            let clipboardData = '';
+            Object.defineProperty(navigator, 'clipboard', {
+              value: {
+                writeText: async (text) => {
+                  clipboardData = text;
+                  window.__clipboardData = clipboardData;
+                  return Promise.resolve();
+                },
+                write: async (data) => {
+                  const item = data[0];
+                  for (const type of item.types) {
+                    const blob = await item.getType(type);
+                    clipboardData = await blob.text();
+                    window.__clipboardData = clipboardData;
+                  }
+                  return Promise.resolve();
+                },
+                readText: async () => {
+                  return Promise.resolve(window.__clipboardData || '');
+                }
+              },
+              writable: false
+            });
+          });
+        },
+        async readClipboard() {
+          return await page.evaluate(() => window.__clipboardData);
+        },
+        verify(content) {
+          expect(content).toContain('Alice Johnson');
+          expect(content).toContain('Senior Developer');
+        }
+      },
+      default: {
+        async grantPermissions() {},
+        async readClipboard() {
+          return await page.evaluate(async () => {
+            return await navigator.clipboard.readText();
+          });
+        },
+        verify(content) {
+          expect(content).toContain('Alice Johnson');
+          expect(content).toContain('Senior Developer');
+        }
+      }
+    };
+
+    const strategy = clipboardStrategies[browserName] || clipboardStrategies.default;
+
+    await strategy.grantPermissions();
+    await page.goto('/');
+
+    await page.locator('#in-name').clear();
+    await page.locator('#in-name').fill('Alice Johnson');
+    await page.locator('#in-job').clear();
+    await page.locator('#in-job').fill('Senior Developer');
+
+    await page.locator('#btn-copy').click();
+    await page.waitForTimeout(500);
+
+    const clipboardContent = await strategy.readClipboard();
+    strategy.verify(clipboardContent);
   });
 });

@@ -1,4 +1,5 @@
 // @ts-check
+require('dotenv').config();
 const { defineConfig, devices } = require('@playwright/test');
 
 /**
@@ -12,7 +13,7 @@ module.exports = defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: `http://localhost:${process.env.PORT || 3000}`,
     trace: 'on-first-retry',
   },
 
@@ -21,11 +22,19 @@ module.exports = defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
+    },
   ],
 
   webServer: {
     command: 'node server.js',
-    url: 'http://localhost:3000',
+    url: `http://localhost:${process.env.PORT || 3000}`,
     reuseExistingServer: !process.env.CI,
   },
 });
