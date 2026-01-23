@@ -4,6 +4,9 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// NOTE: This is a simple development/testing server for serving static files.
+// For production use, consider adding rate limiting using express-rate-limit or similar middleware.
+
 // Serve static files from the current directory
 app.use(express.static(path.join(__dirname)));
 
