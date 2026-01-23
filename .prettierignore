@@ -1,0 +1,22 @@
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+build
+
+# Test results
+test-results
+playwright-report
+
+# Temporary files
+temp
+*.log
+
+# Git
+.git
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
