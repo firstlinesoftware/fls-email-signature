@@ -4,10 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Create your FLS email signature</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.4/build/css/intlTelInput.css"
-    />
     <style>
       :root {
         --preview-bg: #ffffff;
@@ -450,11 +446,6 @@
           },
         },
         ICON_SIZE: 28,
-        PHONE_INPUT: {
-          INITIAL_COUNTRY: 'us',
-          PREFERRED_COUNTRIES: ['us', 'ru', 'ua', 'by'],
-          UTILS_SCRIPT: 'https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.4/build/js/utils.js',
-        },
         UI_TEXT: {
           COPY_BUTTON: 'Copy Signature',
           COPY_SUCCESS: 'Copied!',
@@ -485,9 +476,6 @@
       const iconSun = document.getElementById('icon-sun');
       const iconMoon = document.getElementById('icon-moon');
 
-      // intl-tel-input instance (initialized at the end of the script)
-      let iti = null;
-
       // Sanitize input to prevent XSS
       function sanitize(input) {
         const temp = document.createElement('div');
@@ -495,23 +483,23 @@
         return temp.innerHTML;
       }
 
+      // Format phone number using libphonenumber-js
+      function formatPhoneNumber(phoneInput) {
+        try {
+          const parsed = libphonenumber.parsePhoneNumber(phoneInput);
+          return parsed.formatInternational();
+        } catch (e) {
+          // If parsing fails, return original input
+          return phoneInput;
+        }
+      }
+
       // Generate signature HTML
       function generateSignature() {
         const name = sanitize(nameInput.value || CONFIG.DEFAULT_NAME);
         const job = sanitize(jobInput.value || CONFIG.DEFAULT_JOB);
-
-        // Construct phone number from dial code + input value
-        let phone = CONFIG.DEFAULT_PHONE;
-        if (iti && phoneInput.value) {
-          const countryData = iti.getSelectedCountryData();
-          const dialCode = countryData.dialCode;
-          const inputValue = phoneInput.value;
-          phone = `+${dialCode} ${inputValue}`;
-        } else if (phoneInput.value) {
-          phone = phoneInput.value;
-        }
-
-        phone = sanitize(phone);
+        const phoneRaw = phoneInput.value || CONFIG.DEFAULT_PHONE;
+        const phone = sanitize(formatPhoneNumber(phoneRaw));
         // Remove everything except digits and + for tel: link
         const phoneLink = phone.replace(/[^\d+]/g, '');
 
@@ -666,10 +654,18 @@
         }
       }
 
+      // Format phone input as you type
+      phoneInput.addEventListener('input', (e) => {
+        const value = e.target.value;
+        const formatter = new libphonenumber.AsYouType();
+        const formatted = formatter.input(value);
+        e.target.value = formatted;
+        updatePreview();
+      });
+
       // Event listeners
       nameInput.addEventListener('input', updatePreview);
       jobInput.addEventListener('input', updatePreview);
-      phoneInput.addEventListener('input', updatePreview);
       copyBtn.addEventListener('click', copySignature);
       helpBtn.addEventListener('click', () => modal.classList.add('active'));
       closeModalBtn.addEventListener('click', () => modal.classList.remove('active'));
@@ -681,19 +677,7 @@
       // Initialize
       updatePreview();
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.4/build/js/intlTelInput.min.js"></script>
-    <script>
-      // Initialize intl-tel-input
-      const phoneInputField = document.querySelector('#in-phone');
-      iti = window.intlTelInput(phoneInputField, {
-        initialCountry: CONFIG.PHONE_INPUT.INITIAL_COUNTRY,
-        preferredCountries: CONFIG.PHONE_INPUT.PREFERRED_COUNTRIES,
-        separateDialCode: true,
-        formatOnDisplay: true,
-        formatOnType: true,
-        autoPlaceholder: 'false',
-        utilsScript: CONFIG.PHONE_INPUT.UTILS_SCRIPT,
-      });
-    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/libphonenumber-js@1.10.14/bundle/libphonenumber-min.js"></script>
   </body>
 </html>
