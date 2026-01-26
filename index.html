@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Create your FLS email signature</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.4/build/css/intlTelInput.css"
+    />
     <style>
       :root {
         --preview-bg: #ffffff;
@@ -59,7 +63,13 @@
       .form-row {
         display: flex;
         gap: 16px;
-        margin-bottom: 16px;
+        margin-bottom: 4px;
+      }
+
+      .form-row > div {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
       }
 
       .form-row input {
@@ -74,12 +84,36 @@
         transition: box-shadow 0.2s;
       }
 
+      .form-row > div > input {
+        margin-bottom: 4px;
+      }
+
+      .form-row > div > span {
+        font-size: 12px;
+        color: #999;
+        padding: 0 4px;
+        margin-bottom: 16px;
+      }
+
       .form-row input:focus {
         box-shadow: 0 0 0 2px #1a1a1a;
       }
 
       .form-row input::placeholder {
         color: #999;
+      }
+
+      .form-hint {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+
+      .form-hint span {
+        flex: 1;
+        font-size: 12px;
+        color: #999;
+        padding: 0 4px;
       }
 
       .preview-card {
@@ -249,6 +283,23 @@
       @media (max-width: 600px) {
         .form-row {
           flex-direction: column;
+          gap: 0;
+        }
+
+        .form-row > div {
+          width: 100%;
+        }
+
+        .form-hint {
+          flex-direction: column;
+          gap: 4px;
+          margin-bottom: 12px;
+          align-items: flex-start;
+        }
+
+        .form-hint span {
+          flex: none;
+          width: 100%;
         }
 
         .buttons {
@@ -265,8 +316,21 @@
       </div>
 
       <div class="form-row">
-        <input type="text" id="in-name" placeholder="Full Name" value="John Smith" />
-        <input type="text" id="in-job" placeholder="Job Title" value="Software Engineer" />
+        <div>
+          <input type="text" id="in-name" placeholder="Full Name" value="John Smith" />
+          <span>Enter your full name</span>
+        </div>
+        <div>
+          <input type="text" id="in-job" placeholder="Job Title" value="Software Engineer" />
+          <span>Enter your job title</span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <input type="tel" id="in-phone" value="+1 877 737 7178" />
+      </div>
+      <div class="form-hint">
+        <span>Enter your phone number</span>
       </div>
 
       <div class="preview-card">
@@ -346,16 +410,72 @@
 
     <script>
       // Configuration
-      const BASE_URL = 'https://nl.firstlinesoftware.com/fls-email-signature';
+      const CONFIG = {
+        BASE_URL: 'https://nl.firstlinesoftware.com/fls-email-signature',
+        COMPANY_NAME: 'First Line Software',
+        DEFAULT_NAME: 'Your Name',
+        DEFAULT_JOB: 'Job Title',
+        DEFAULT_PHONE: '+18777377178',
+        SIGNATURE_GREETING: 'Best regards,',
+        LOGO: {
+          FILE: 'logo-fls-v3.png',
+          WIDTH: 150,
+          ALT: 'First Line Software',
+        },
+        SOCIAL: {
+          WEBSITE: {
+            URL: 'https://firstlinesoftware.com',
+            ICON: 'link-circle-black.png',
+            ALT: 'Website',
+          },
+          LINKEDIN: {
+            URL: 'https://www.linkedin.com/company/first-line-software-inc/mycompany/',
+            ICON: 'linkedin-circle-black.png',
+            ALT: 'LinkedIn',
+          },
+          INSTAGRAM: {
+            URL: 'https://www.instagram.com/firstlinesoftware/',
+            ICON: 'instagram-circle-black.png',
+            ALT: 'Instagram',
+          },
+          YOUTUBE: {
+            URL: 'https://www.youtube.com/@fls_fam',
+            ICON: 'youtube-circle-black.png',
+            ALT: 'YouTube',
+          },
+          PODCASTS: {
+            URL: 'https://podcasts.apple.com/cz/podcast/spam-jam-by-first-line-software/id1761346338',
+            ICON: 'itunespodcasts-circle-black.png',
+            ALT: 'Podcasts',
+          },
+        },
+        ICON_SIZE: 28,
+        PHONE_INPUT: {
+          INITIAL_COUNTRY: 'us',
+          PREFERRED_COUNTRIES: ['us', 'ru', 'ua', 'by'],
+          UTILS_SCRIPT: 'https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.4/build/js/utils.js',
+        },
+        UI_TEXT: {
+          COPY_BUTTON: 'Copy Signature',
+          COPY_SUCCESS: 'Copied!',
+          COPY_SUCCESS_DURATION: 2000,
+        },
+      };
 
       // Get logo image path
       function getLogoImage() {
-        return `${BASE_URL}/images/logo-fls-v3.png`;
+        return `${CONFIG.BASE_URL}/images/${CONFIG.LOGO.FILE}`;
+      }
+
+      // Get social icon path
+      function getSocialIcon(iconFile) {
+        return `${CONFIG.BASE_URL}/images/${iconFile}`;
       }
 
       // Elements
       const nameInput = document.getElementById('in-name');
       const jobInput = document.getElementById('in-job');
+      const phoneInput = document.getElementById('in-phone');
       const preview = document.getElementById('signature-preview');
       const copyBtn = document.getElementById('btn-copy');
       const helpBtn = document.getElementById('btn-help');
@@ -365,16 +485,41 @@
       const iconSun = document.getElementById('icon-sun');
       const iconMoon = document.getElementById('icon-moon');
 
+      // intl-tel-input instance (initialized at the end of the script)
+      let iti = null;
+
+      // Sanitize input to prevent XSS
+      function sanitize(input) {
+        const temp = document.createElement('div');
+        temp.textContent = input;
+        return temp.innerHTML;
+      }
+
       // Generate signature HTML
       function generateSignature() {
-        const name = nameInput.value || 'Your Name';
-        const job = jobInput.value || 'Job Title';
+        const name = sanitize(nameInput.value || CONFIG.DEFAULT_NAME);
+        const job = sanitize(jobInput.value || CONFIG.DEFAULT_JOB);
 
-        return `<p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; margin: 0 0 12px 0;">Best regards,</p>
+        // Construct phone number from dial code + input value
+        let phone = CONFIG.DEFAULT_PHONE;
+        if (iti && phoneInput.value) {
+          const countryData = iti.getSelectedCountryData();
+          const dialCode = countryData.dialCode;
+          const inputValue = phoneInput.value;
+          phone = `+${dialCode} ${inputValue}`;
+        } else if (phoneInput.value) {
+          phone = phoneInput.value;
+        }
+
+        phone = sanitize(phone);
+        // Remove everything except digits and + for tel: link
+        const phoneLink = phone.replace(/[^\d+]/g, '');
+
+        return `<p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; margin: 0 0 12px 0;">${CONFIG.SIGNATURE_GREETING}</p>
 <table cellspacing="0" cellpadding="0" style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; max-width: 480px; width: 100%;">
   <tr>
-    <td style="width: 150px; vertical-align: center;">
-      <img src="${getLogoImage()}" alt="First Line Software" width="150" style="display: block; max-width: 100%; height: auto;">
+    <td style="width: ${CONFIG.LOGO.WIDTH}px; vertical-align: center;">
+      <img src="${getLogoImage()}" alt="${CONFIG.LOGO.ALT}" width="${CONFIG.LOGO.WIDTH}" style="display: block; max-width: 100%; height: auto;">
     </td>
     <td style="width: 20px;"></td>
     <td style="width: 1px; background-color: #cccccc;"></td>
@@ -393,12 +538,12 @@
         </tr>
         <tr>
           <td style="padding-bottom: 4px;">
-            First Line Software
+            ${CONFIG.COMPANY_NAME}
           </td>
         </tr>
         <tr>
           <td style="padding-bottom: 12px;">
-            Tel: <a href="tel:+18777377178" style="color: inherit; text-decoration: none;">+1 877 737 7178</a>
+            Tel: <a href="tel:${phoneLink}" style="color: inherit; text-decoration: none;">${phone}</a>
           </td>
         </tr>
         <tr>
@@ -406,28 +551,28 @@
             <table cellspacing="0" cellpadding="0">
               <tr>
                 <td style="padding-right: 8px;">
-                  <a href="https://firstlinesoftware.com" target="_blank">
-                    <img src="${BASE_URL}/images/link-circle-black.png" alt="Website" width="28" height="28" class="s" style="display: block;">
+                  <a href="${CONFIG.SOCIAL.WEBSITE.URL}" target="_blank">
+                    <img src="${getSocialIcon(CONFIG.SOCIAL.WEBSITE.ICON)}" alt="${CONFIG.SOCIAL.WEBSITE.ALT}" width="${CONFIG.ICON_SIZE}" height="${CONFIG.ICON_SIZE}" class="s" style="display: block;">
                   </a>
                 </td>
                 <td style="padding-right: 8px;">
-                  <a href="https://www.linkedin.com/company/first-line-software-inc/mycompany/" target="_blank">
-                    <img src="${BASE_URL}/images/linkedin-circle-black.png" alt="LinkedIn" width="28" height="28" class="s" style="display: block;">
+                  <a href="${CONFIG.SOCIAL.LINKEDIN.URL}" target="_blank">
+                    <img src="${getSocialIcon(CONFIG.SOCIAL.LINKEDIN.ICON)}" alt="${CONFIG.SOCIAL.LINKEDIN.ALT}" width="${CONFIG.ICON_SIZE}" height="${CONFIG.ICON_SIZE}" class="s" style="display: block;">
                   </a>
                 </td>
                 <td style="padding-right: 8px;">
-                  <a href="https://www.instagram.com/firstlinesoftware/" target="_blank">
-                    <img src="${BASE_URL}/images/instagram-circle-black.png" alt="Instagram" width="28" height="28" class="s" style="display: block;">
+                  <a href="${CONFIG.SOCIAL.INSTAGRAM.URL}" target="_blank">
+                    <img src="${getSocialIcon(CONFIG.SOCIAL.INSTAGRAM.ICON)}" alt="${CONFIG.SOCIAL.INSTAGRAM.ALT}" width="${CONFIG.ICON_SIZE}" height="${CONFIG.ICON_SIZE}" class="s" style="display: block;">
                   </a>
                 </td>
                 <td style="padding-right: 8px;">
-                  <a href="https://www.youtube.com/@fls_fam" target="_blank">
-                    <img src="${BASE_URL}/images/youtube-circle-black.png" alt="YouTube" width="28" height="28" class="s" style="display: block;">
+                  <a href="${CONFIG.SOCIAL.YOUTUBE.URL}" target="_blank">
+                    <img src="${getSocialIcon(CONFIG.SOCIAL.YOUTUBE.ICON)}" alt="${CONFIG.SOCIAL.YOUTUBE.ALT}" width="${CONFIG.ICON_SIZE}" height="${CONFIG.ICON_SIZE}" class="s" style="display: block;">
                   </a>
                 </td>
                 <td>
-                  <a href="https://podcasts.apple.com/cz/podcast/spam-jam-by-first-line-software/id1761346338" target="_blank">
-                    <img src="${BASE_URL}/images/itunespodcasts-circle-black.png" alt="Podcasts" width="28" height="28" class="s" style="display: block;">
+                  <a href="${CONFIG.SOCIAL.PODCASTS.URL}" target="_blank">
+                    <img src="${getSocialIcon(CONFIG.SOCIAL.PODCASTS.ICON)}" alt="${CONFIG.SOCIAL.PODCASTS.ALT}" width="${CONFIG.ICON_SIZE}" height="${CONFIG.ICON_SIZE}" class="s" style="display: block;">
                   </a>
                 </td>
               </tr>
@@ -493,15 +638,15 @@
       function showCopySuccess() {
         const span = copyBtn.querySelector('span');
         const svg = copyBtn.querySelector('svg');
-        span.textContent = 'Copied!';
+        span.textContent = CONFIG.UI_TEXT.COPY_SUCCESS;
         svg.innerHTML = '<polyline points="20 6 9 17 4 12"></polyline>'; // Checkmark
         copyBtn.classList.add('success');
         setTimeout(() => {
-          span.textContent = 'Copy Signature';
+          span.textContent = CONFIG.UI_TEXT.COPY_BUTTON;
           svg.innerHTML =
             '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
           copyBtn.classList.remove('success');
-        }, 2000);
+        }, CONFIG.UI_TEXT.COPY_SUCCESS_DURATION);
       }
 
       // Dark mode toggle
@@ -524,6 +669,7 @@
       // Event listeners
       nameInput.addEventListener('input', updatePreview);
       jobInput.addEventListener('input', updatePreview);
+      phoneInput.addEventListener('input', updatePreview);
       copyBtn.addEventListener('click', copySignature);
       helpBtn.addEventListener('click', () => modal.classList.add('active'));
       closeModalBtn.addEventListener('click', () => modal.classList.remove('active'));
@@ -534,6 +680,20 @@
 
       // Initialize
       updatePreview();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.4/build/js/intlTelInput.min.js"></script>
+    <script>
+      // Initialize intl-tel-input
+      const phoneInputField = document.querySelector('#in-phone');
+      iti = window.intlTelInput(phoneInputField, {
+        initialCountry: CONFIG.PHONE_INPUT.INITIAL_COUNTRY,
+        preferredCountries: CONFIG.PHONE_INPUT.PREFERRED_COUNTRIES,
+        separateDialCode: true,
+        formatOnDisplay: true,
+        formatOnType: true,
+        autoPlaceholder: 'false',
+        utilsScript: CONFIG.PHONE_INPUT.UTILS_SCRIPT,
+      });
     </script>
   </body>
 </html>
