@@ -55,4 +55,6 @@ npm run test:headed   # Run tests in headed mode (see browser windows)
 
 ## Production
 
-The application is hosted on GitHub Pages. The static `index.html` file works standalone without the Express server in production.
+The application is hosted on GitHub Pages at: **https://nl.firstlinesoftware.com/fls-email-signature**
+
+The static `index.html` file works standalone without the Express server in production.

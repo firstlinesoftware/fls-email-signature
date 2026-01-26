@@ -136,6 +136,11 @@
         color: inherit !important;
       }
 
+      /* Email client dark mode emulation - invert social media icons */
+      .preview-dark #signature-preview .s {
+        filter: invert(1);
+      }
+
       .buttons {
         display: flex;
         gap: 16px;
@@ -341,16 +346,11 @@
 
     <script>
       // Configuration
-      const GITHUB_BASE_URL = 'https://nl.firstlinesoftware.com/fls-email-signature';
-
-      // For local development, use relative paths
-      const isLocalDevelopment =
-        window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const BASE_URL = isLocalDevelopment ? '.' : GITHUB_BASE_URL;
+      const BASE_URL = 'https://nl.firstlinesoftware.com/fls-email-signature';
 
       // Get logo image path
       function getLogoImage() {
-        return `${BASE_URL}/images/logo_fls_v2.png`;
+        return `${BASE_URL}/images/logo-fls-v3.png`;
       }
 
       // Elements
@@ -370,7 +370,8 @@
         const name = nameInput.value || 'Your Name';
         const job = jobInput.value || 'Job Title';
 
-        return `<table cellspacing="0" cellpadding="0" style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; max-width: 480px; width: 100%;">
+        return `<p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; margin: 0 0 12px 0;">Best regards,</p>
+<table cellspacing="0" cellpadding="0" style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; max-width: 480px; width: 100%;">
   <tr>
     <td style="width: 150px; vertical-align: center;">
       <img src="${getLogoImage()}" alt="First Line Software" width="150" style="display: block; max-width: 100%; height: auto;">
@@ -406,27 +407,27 @@
               <tr>
                 <td style="padding-right: 8px;">
                   <a href="https://firstlinesoftware.com" target="_blank">
-                    <img src="${BASE_URL}/images/link-circle-black.png" alt="Website" width="28" height="28" style="display: block;">
+                    <img src="${BASE_URL}/images/link-circle-black.png" alt="Website" width="28" height="28" class="s" style="display: block;">
                   </a>
                 </td>
                 <td style="padding-right: 8px;">
                   <a href="https://www.linkedin.com/company/first-line-software-inc/mycompany/" target="_blank">
-                    <img src="${BASE_URL}/images/linkedin-circle-black.png" alt="LinkedIn" width="28" height="28" style="display: block;">
+                    <img src="${BASE_URL}/images/linkedin-circle-black.png" alt="LinkedIn" width="28" height="28" class="s" style="display: block;">
                   </a>
                 </td>
                 <td style="padding-right: 8px;">
                   <a href="https://www.instagram.com/firstlinesoftware/" target="_blank">
-                    <img src="${BASE_URL}/images/instagram-circle-black.png" alt="Instagram" width="28" height="28" style="display: block;">
+                    <img src="${BASE_URL}/images/instagram-circle-black.png" alt="Instagram" width="28" height="28" class="s" style="display: block;">
                   </a>
                 </td>
                 <td style="padding-right: 8px;">
                   <a href="https://www.youtube.com/@fls_fam" target="_blank">
-                    <img src="${BASE_URL}/images/youtube-circle-black.png" alt="YouTube" width="28" height="28" style="display: block;">
+                    <img src="${BASE_URL}/images/youtube-circle-black.png" alt="YouTube" width="28" height="28" class="s" style="display: block;">
                   </a>
                 </td>
                 <td>
                   <a href="https://podcasts.apple.com/cz/podcast/spam-jam-by-first-line-software/id1761346338" target="_blank">
-                    <img src="${BASE_URL}/images/itunespodcasts-circle-black.png" alt="Podcasts" width="28" height="28" style="display: block;">
+                    <img src="${BASE_URL}/images/itunespodcasts-circle-black.png" alt="Podcasts" width="28" height="28" class="s" style="display: block;">
                   </a>
                 </td>
               </tr>
