@@ -435,7 +435,7 @@
             ALT: 'Instagram',
           },
           YOUTUBE: {
-            URL: 'https://www.youtube.com/@fls_fam',
+            URL: 'https://www.youtube.com/@first-line-software',
             ICON: 'youtube-circle-black.png',
             ALT: 'YouTube',
           },
@@ -511,7 +511,7 @@
         const phoneRaw = phoneInput.value || CONFIG.DEFAULT_PHONE;
         const phone = formatPhoneNumber(phoneRaw);
 
-        return `${CONFIG.SIGNATURE_GREETING}\n\n${name}\n${job}\n${CONFIG.COMPANY_NAME}\nTel: ${phone}\n\nWebsite: ${CONFIG.SOCIAL.WEBSITE.URL}`;
+        return `${CONFIG.SIGNATURE_GREETING}\n\n${name}\n${job}\n${CONFIG.COMPANY_NAME}\nTel: ${phone}\n\nWebsite: ${CONFIG.SOCIAL.WEBSITE.URL}\nLinkedIn: ${CONFIG.SOCIAL.LINKEDIN.URL}\n\nFirst Line Software\nAI - Native engineering company`;
       }
 
       // Generate signature HTML
@@ -527,7 +527,9 @@
 <table cellspacing="0" cellpadding="0" style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; max-width: 480px; width: 100%;">
   <tr>
     <td style="width: ${CONFIG.LOGO.WIDTH}px; vertical-align: middle;">
-      <img src="${getLogoImage()}" alt="${CONFIG.LOGO.ALT}" width="${CONFIG.LOGO.WIDTH}" style="display: block; max-width: 100%; height: auto;">
+      <a href="${CONFIG.SOCIAL.WEBSITE.URL}" target="_blank">
+        <img src="${getLogoImage()}" alt="${CONFIG.LOGO.ALT}" width="${CONFIG.LOGO.WIDTH}" style="display: block; max-width: 100%; height: auto;">
+      </a>
     </td>
     <td style="width: 20px;"></td>
     <td style="width: 1px; background-color: #cccccc;"></td>
@@ -559,28 +561,28 @@
             <table cellspacing="0" cellpadding="0">
               <tr>
                 <td style="padding-right: 8px;">
-                  <a href="${CONFIG.SOCIAL.WEBSITE.URL}" target="_blank">
-                    <img src="${getSocialIcon(CONFIG.SOCIAL.WEBSITE.ICON)}" alt="${CONFIG.SOCIAL.WEBSITE.ALT}" width="${CONFIG.ICON_SIZE}" height="${CONFIG.ICON_SIZE}" class="s" style="display: block;">
-                  </a>
-                </td>
-                <td style="padding-right: 8px;">
                   <a href="${CONFIG.SOCIAL.LINKEDIN.URL}" target="_blank">
                     <img src="${getSocialIcon(CONFIG.SOCIAL.LINKEDIN.ICON)}" alt="${CONFIG.SOCIAL.LINKEDIN.ALT}" width="${CONFIG.ICON_SIZE}" height="${CONFIG.ICON_SIZE}" class="s" style="display: block;">
                   </a>
                 </td>
                 <td style="padding-right: 8px;">
+                  <a href="${CONFIG.SOCIAL.WEBSITE.URL}" target="_blank">
+                    <img src="${getSocialIcon(CONFIG.SOCIAL.WEBSITE.ICON)}" alt="_" width="${CONFIG.ICON_SIZE}" height="${CONFIG.ICON_SIZE}" class="s" style="display: block;">
+                  </a>
+                </td>
+                <td style="padding-right: 8px;">
                   <a href="${CONFIG.SOCIAL.INSTAGRAM.URL}" target="_blank">
-                    <img src="${getSocialIcon(CONFIG.SOCIAL.INSTAGRAM.ICON)}" alt="${CONFIG.SOCIAL.INSTAGRAM.ALT}" width="${CONFIG.ICON_SIZE}" height="${CONFIG.ICON_SIZE}" class="s" style="display: block;">
+                    <img src="${getSocialIcon(CONFIG.SOCIAL.INSTAGRAM.ICON)}" alt="_" width="${CONFIG.ICON_SIZE}" height="${CONFIG.ICON_SIZE}" class="s" style="display: block;">
                   </a>
                 </td>
                 <td style="padding-right: 8px;">
                   <a href="${CONFIG.SOCIAL.YOUTUBE.URL}" target="_blank">
-                    <img src="${getSocialIcon(CONFIG.SOCIAL.YOUTUBE.ICON)}" alt="${CONFIG.SOCIAL.YOUTUBE.ALT}" width="${CONFIG.ICON_SIZE}" height="${CONFIG.ICON_SIZE}" class="s" style="display: block;">
+                    <img src="${getSocialIcon(CONFIG.SOCIAL.YOUTUBE.ICON)}" alt="_" width="${CONFIG.ICON_SIZE}" height="${CONFIG.ICON_SIZE}" class="s" style="display: block;">
                   </a>
                 </td>
                 <td>
                   <a href="${CONFIG.SOCIAL.PODCASTS.URL}" target="_blank">
-                    <img src="${getSocialIcon(CONFIG.SOCIAL.PODCASTS.ICON)}" alt="${CONFIG.SOCIAL.PODCASTS.ALT}" width="${CONFIG.ICON_SIZE}" height="${CONFIG.ICON_SIZE}" class="s" style="display: block;">
+                    <img src="${getSocialIcon(CONFIG.SOCIAL.PODCASTS.ICON)}" alt="_" width="${CONFIG.ICON_SIZE}" height="${CONFIG.ICON_SIZE}" class="s" style="display: block;">
                   </a>
                 </td>
               </tr>
@@ -590,7 +592,11 @@
       </table>
     </td>
   </tr>
-</table>`;
+</table>
+<p style="font-family: Arial, Helvetica, sans-serif; margin: 8px 0 0 0;">
+  <strong style="font-size: 14px;">First Line Software</strong><br>
+  <span style="font-size: 11px; color: #666666;">AI - Native engineering company</span>
+</p>`;
       }
 
       // Update preview
