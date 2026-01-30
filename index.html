@@ -494,6 +494,26 @@
         }
       }
 
+      // Minify HTML - remove line breaks and extra whitespace
+      function minifyHTML(html) {
+        return html
+          .replace(/\n/g, '') // Remove newlines
+          .replace(/\r/g, '') // Remove carriage returns
+          .replace(/\s+/g, ' ') // Collapse multiple spaces to one
+          .replace(/>\s+</g, '><') // Remove spaces between tags
+          .trim(); // Trim edges
+      }
+
+      // Generate plain text version without HTML tags
+      function generatePlainText() {
+        const name = nameInput.value || CONFIG.DEFAULT_NAME;
+        const job = jobInput.value || CONFIG.DEFAULT_JOB;
+        const phoneRaw = phoneInput.value || CONFIG.DEFAULT_PHONE;
+        const phone = formatPhoneNumber(phoneRaw);
+
+        return `${CONFIG.SIGNATURE_GREETING}\n\n${name}\n${job}\n${CONFIG.COMPANY_NAME}\nTel: ${phone}\n\nWebsite: ${CONFIG.SOCIAL.WEBSITE.URL}`;
+      }
+
       // Generate signature HTML
       function generateSignature() {
         const name = sanitize(nameInput.value || CONFIG.DEFAULT_NAME);
@@ -580,14 +600,15 @@
 
       // Copy to clipboard
       async function copySignature() {
-        // Get HTML from already rendered preview
-        const container = document.getElementById('signature-preview');
-        const html = container.innerHTML;
+        // Generate fresh HTML and minify it
+        const html = minifyHTML(generateSignature());
+        // Generate proper plain text version
+        const plainText = generatePlainText();
 
         try {
           // Primary method: ClipboardItem API with both HTML and plain text
           const htmlBlob = new Blob([html], { type: 'text/html' });
-          const textBlob = new Blob([html], { type: 'text/plain' });
+          const textBlob = new Blob([plainText], { type: 'text/plain' });
           const data = [
             new ClipboardItem({
               'text/html': htmlBlob,
