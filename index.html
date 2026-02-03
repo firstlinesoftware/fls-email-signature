@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create your FLS email signature</title>
+    <link rel="icon" href="favicon/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon/favicon.svg" type="image/svg+xml">
+    <style>
+      :root {
+        --preview-bg: #ffffff;
+        --preview-text: #000000;
+        --preview-border: #cccccc;
+      }
+
+      .preview-dark {
+        --preview-bg: #1d1b1b;
+        --preview-text: #ffffff;
+        --preview-border: #444444;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        background-color: #f5f0eb;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: start;
+        padding: 40px 20px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 720px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 32px;
+      }
+
+      .header h1 {
+        font-size: 28px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+      }
+
+      .header p {
+        font-size: 16px;
+        color: #666;
+      }
+
+      .form-row {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 4px;
+      }
+
+      .form-row > div {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .form-row input {
+        flex: 1;
+        padding: 16px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 12px;
+        background: #fff;
+        color: #1a1a1a;
+        outline: none;
+        transition: box-shadow 0.2s;
+      }
+
+      .form-row > div > input {
+        margin-bottom: 4px;
+      }
+
+      .form-row > div > span {
+        font-size: 12px;
+        color: #999;
+        padding: 0 4px;
+        margin-bottom: 16px;
+      }
+
+      .form-row input:focus {
+        box-shadow: 0 0 0 2px #1a1a1a;
+      }
+
+      .form-row input::placeholder {
+        color: #999;
+      }
+
+      .form-hint {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+
+      .form-hint span {
+        flex: 1;
+        font-size: 12px;
+        color: #999;
+        padding: 0 4px;
+      }
+
+      .preview-card {
+        background: var(--preview-bg);
+        border-radius: 16px;
+        padding: 12px;
+        margin-top: 24px;
+        position: relative;
+        transition: background-color 0.3s;
+      }
+
+      .preview-label {
+        position: absolute;
+        top: 12px;
+        right: 16px;
+        display: flex;
+        gap: 4px;
+      }
+
+      .preview-label button {
+        width: 32px;
+        height: 32px;
+        border: none;
+        border-radius: 8px;
+        background: #f5f5f5;
+        color: #1a1a1a;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+      }
+
+      .preview-label button:hover {
+        background: #eee;
+      }
+
+      .preview-label button svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      #signature-preview {
+        color: var(--preview-text);
+        transition: color 0.3s;
+      }
+
+      #signature-preview table {
+        color: inherit;
+      }
+
+      #signature-preview td,
+      #signature-preview strong {
+        color: inherit !important;
+      }
+
+      /* Email client dark mode emulation - invert social media icons */
+      .preview-dark #signature-preview .s {
+        filter: invert(1);
+      }
+
+      .buttons {
+        display: flex;
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      .btn {
+        flex: 1;
+        padding: 16px 24px;
+        font-size: 16px;
+        font-weight: 500;
+        border-radius: 12px;
+        cursor: pointer;
+        transition:
+          transform 0.1s,
+          box-shadow 0.2s;
+      }
+
+      .btn:active {
+        transform: scale(0.98);
+      }
+
+      .btn-primary {
+        background: #1a1a1a;
+        color: #fff;
+        border: none;
+      }
+
+      .btn-primary:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-primary.success {
+        background: #22c55e;
+      }
+
+      .btn-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .btn-icon svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+      }
+
+      .btn-secondary {
+        background: #fff;
+        color: #1a1a1a;
+        border: 1px solid #ddd;
+      }
+
+      .btn-secondary:hover {
+        border-color: #1a1a1a;
+      }
+
+      /* Modal */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .modal-overlay.active {
+        display: flex;
+      }
+
+      .modal {
+        background: #fff;
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 480px;
+        width: 90%;
+      }
+
+      .modal h2 {
+        font-size: 20px;
+        margin-bottom: 16px;
+      }
+
+      .modal ol {
+        margin-left: 20px;
+        line-height: 1.8;
+        color: #444;
+      }
+
+      .modal ol li {
+        margin-bottom: 8px;
+      }
+
+      .modal .btn {
+        margin-top: 24px;
+        width: 100%;
+      }
+
+      @media (max-width: 600px) {
+        .form-row {
+          flex-direction: column;
+          gap: 0;
+        }
+
+        .form-row > div {
+          width: 100%;
+        }
+
+        .form-hint {
+          flex-direction: column;
+          gap: 4px;
+          margin-bottom: 12px;
+          align-items: flex-start;
+        }
+
+        .form-hint span {
+          flex: none;
+          width: 100%;
+        }
+
+        .buttons {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Create your FLS email signature</h1>
+        <p>Fill in your details and copy it to your email client</p>
+      </div>
+
+      <div class="form-row">
+        <div>
+          <input type="text" id="in-name" placeholder="Full Name" value="John Smith" />
+          <span>Enter your full name</span>
+        </div>
+        <div>
+          <input type="text" id="in-job" placeholder="Job Title" value="Software Engineer" />
+          <span>Enter your job title</span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <input type="tel" id="in-phone" value="+1 877 737 7178" />
+      </div>
+      <div class="form-hint">
+        <span>Enter your phone number</span>
+      </div>
+
+      <div class="preview-card">
+        <div class="preview-label">
+          <button id="btn-theme-toggle" title="Toggle theme">
+            <svg
+              id="icon-sun"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg
+              id="icon-moon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              style="display: none"
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div id="signature-preview">
+          <!-- Signature will be rendered here -->
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button class="btn btn-primary btn-icon" id="btn-copy">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span>Copy Signature</span>
+        </button>
+        <button class="btn btn-secondary" id="btn-help">How to import?</button>
+      </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="modal-overlay" id="modal">
+      <div class="modal">
+        <h2>How to import your signature</h2>
+        <ol>
+          <li>Click <strong>"Copy Signature"</strong> button</li>
+          <li>Open <strong>Gmail</strong> → Settings (gear icon) → See all settings</li>
+          <li>Scroll down to <strong>"Signature"</strong> section</li>
+          <li>Click <strong>"Create new"</strong> and give it a name</li>
+          <li>
+            Click inside the signature editor and press <strong>Ctrl+V</strong> (or Cmd+V on Mac)
+          </li>
+          <li>Scroll down and click <strong>"Save Changes"</strong></li>
+        </ol>
+        <button class="btn btn-primary" id="btn-close-modal">Got it</button>
+      </div>
+    </div>
+
+    <script>
+      // Configuration
+      const CONFIG = {
+        BASE_URL: 'https://nl.firstlinesoftware.com/fls-email-signature',
+        COMPANY_NAME: 'First Line Software',
+        DEFAULT_NAME: 'Your Name',
+        DEFAULT_JOB: 'Job Title',
+        DEFAULT_PHONE: '+18777377178',
+        SIGNATURE_GREETING: 'Best regards,',
+        LOGO: {
+          FILE: 'logo-fls-v3.png',
+          WIDTH: 150,
+          ALT: 'First Line Software',
+        },
+        SOCIAL: {
+          WEBSITE: {
+            URL: 'https://firstlinesoftware.com',
+            ICON: 'link-circle-black.png',
+            ALT: 'Website',
+          },
+          LINKEDIN: {
+            URL: 'https://www.linkedin.com/company/first-line-software-inc/mycompany/',
+            ICON: 'linkedin-circle-black.png',
+            ALT: 'LinkedIn',
+          },
+          INSTAGRAM: {
+            URL: 'https://www.instagram.com/firstlinesoftware/',
+            ICON: 'instagram-circle-black.png',
+            ALT: 'Instagram',
+          },
+          YOUTUBE: {
+            URL: 'https://www.youtube.com/@first-line-software',
+            ICON: 'youtube-circle-black.png',
+            ALT: 'YouTube',
+          },
+          PODCASTS: {
+            URL: 'https://podcasts.apple.com/cz/podcast/spam-jam-by-first-line-software/id1761346338',
+            ICON: 'itunespodcasts-circle-black.png',
+            ALT: 'Podcasts',
+          },
+        },
+        ICON_SIZE: 28,
+        UI_TEXT: {
+          COPY_BUTTON: 'Copy Signature',
+          COPY_SUCCESS: 'Copied!',
+          COPY_SUCCESS_DURATION: 2000,
+        },
+      };
+
+      // Get logo image path
+      function getLogoImage() {
+        return `${CONFIG.BASE_URL}/images/${CONFIG.LOGO.FILE}`;
+      }
+
+      // Get social icon path
+      function getSocialIcon(iconFile) {
+        return `${CONFIG.BASE_URL}/images/${iconFile}`;
+      }
+
+      // Elements
+      const nameInput = document.getElementById('in-name');
+      const jobInput = document.getElementById('in-job');
+      const phoneInput = document.getElementById('in-phone');
+      const preview = document.getElementById('signature-preview');
+      const copyBtn = document.getElementById('btn-copy');
+      const helpBtn = document.getElementById('btn-help');
+      const modal = document.getElementById('modal');
+      const closeModalBtn = document.getElementById('btn-close-modal');
+      const btnThemeToggle = document.getElementById('btn-theme-toggle');
+      const iconSun = document.getElementById('icon-sun');
+      const iconMoon = document.getElementById('icon-moon');
+
+      // Sanitize input to prevent XSS
+      function sanitize(input) {
+        const temp = document.createElement('div');
+        temp.textContent = input;
+        return temp.innerHTML;
+      }
+
+      // Format phone number using libphonenumber-js
+      function formatPhoneNumber(phoneInput) {
+        try {
+          const parsed = libphonenumber.parsePhoneNumber(phoneInput);
+          return parsed.formatInternational();
+        } catch (e) {
+          // If parsing fails, return original input
+          return phoneInput;
+        }
+      }
+
+      // Minify HTML - remove line breaks and extra whitespace
+      function minifyHTML(html) {
+        return html
+          .replace(/\n/g, '') // Remove newlines
+          .replace(/\r/g, '') // Remove carriage returns
+          .replace(/\s+/g, ' ') // Collapse multiple spaces to one
+          .replace(/>\s+</g, '><') // Remove spaces between tags
+          .trim(); // Trim edges
+      }
+
+      // Generate plain text version without HTML tags
+      function generatePlainText() {
+        const name = nameInput.value || CONFIG.DEFAULT_NAME;
+        const job = jobInput.value || CONFIG.DEFAULT_JOB;
+        const phoneRaw = phoneInput.value || CONFIG.DEFAULT_PHONE;
+        const phone = formatPhoneNumber(phoneRaw);
+
+        return `${CONFIG.SIGNATURE_GREETING}\n\n${name}\n${job}\n${CONFIG.COMPANY_NAME}\nTel: ${phone}\n\nWebsite: ${CONFIG.SOCIAL.WEBSITE.URL}\nLinkedIn: ${CONFIG.SOCIAL.LINKEDIN.URL}\n\nFirst Line Software\nAI-Native Engineering Company`;
+      }
+
+      // Generate signature HTML
+      function generateSignature() {
+        const name = sanitize(nameInput.value || CONFIG.DEFAULT_NAME);
+        const job = sanitize(jobInput.value || CONFIG.DEFAULT_JOB);
+        const phoneRaw = phoneInput.value || CONFIG.DEFAULT_PHONE;
+        const phone = sanitize(formatPhoneNumber(phoneRaw));
+        // Remove everything except digits and + for tel: link
+        const phoneLink = phone.replace(/[^\d+]/g, '');
+
+        return `<p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; margin: 0 0 12px 0;">${CONFIG.SIGNATURE_GREETING}</p>
+<table cellspacing="0" cellpadding="0" style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; max-width: 480px; width: 100%;">
+  <tr>
+    <td style="width: ${CONFIG.LOGO.WIDTH}px; vertical-align: middle;">
+      <a href="${CONFIG.SOCIAL.WEBSITE.URL}" target="_blank">
+        <img src="${getLogoImage()}" alt="${CONFIG.LOGO.ALT}" width="${CONFIG.LOGO.WIDTH}" style="display: block; max-width: 100%; height: auto;">
+      </a>
+    </td>
+    <td style="width: 20px;"></td>
+    <td style="width: 1px; background-color: #cccccc;"></td>
+    <td style="width: 20px;"></td>
+    <td style="vertical-align: top;">
+      <table cellspacing="0" cellpadding="0">
+        <tr>
+          <td style="padding-bottom: 4px;">
+            <strong style="font-size: 16px;">${name}</strong>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding-bottom: 4px;">
+            ${job}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding-bottom: 4px;">
+            ${CONFIG.COMPANY_NAME}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding-bottom: 8px;">
+            Tel: <a href="tel:${phoneLink}" style="color: inherit; text-decoration: none;">${phone}</a>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <table cellspacing="0" cellpadding="0">
+              <tr>
+                <td style="padding-right: 8px;">
+                  <a href="${CONFIG.SOCIAL.LINKEDIN.URL}" target="_blank">
+                    <img src="${getSocialIcon(CONFIG.SOCIAL.LINKEDIN.ICON)}" alt="${CONFIG.SOCIAL.LINKEDIN.ALT}" width="${CONFIG.ICON_SIZE}" height="${CONFIG.ICON_SIZE}" class="s" style="display: block;">
+                  </a>
+                </td>
+                <td style="padding-right: 8px;">
+                  <a href="${CONFIG.SOCIAL.WEBSITE.URL}" target="_blank">
+                    <img src="${getSocialIcon(CONFIG.SOCIAL.WEBSITE.ICON)}" alt="_" width="${CONFIG.ICON_SIZE}" height="${CONFIG.ICON_SIZE}" class="s" style="display: block;">
+                  </a>
+                </td>
+                <td style="padding-right: 8px;">
+                  <a href="${CONFIG.SOCIAL.INSTAGRAM.URL}" target="_blank">
+                    <img src="${getSocialIcon(CONFIG.SOCIAL.INSTAGRAM.ICON)}" alt="_" width="${CONFIG.ICON_SIZE}" height="${CONFIG.ICON_SIZE}" class="s" style="display: block;">
+                  </a>
+                </td>
+                <td style="padding-right: 8px;">
+                  <a href="${CONFIG.SOCIAL.YOUTUBE.URL}" target="_blank">
+                    <img src="${getSocialIcon(CONFIG.SOCIAL.YOUTUBE.ICON)}" alt="_" width="${CONFIG.ICON_SIZE}" height="${CONFIG.ICON_SIZE}" class="s" style="display: block;">
+                  </a>
+                </td>
+                <td>
+                  <a href="${CONFIG.SOCIAL.PODCASTS.URL}" target="_blank">
+                    <img src="${getSocialIcon(CONFIG.SOCIAL.PODCASTS.ICON)}" alt="_" width="${CONFIG.ICON_SIZE}" height="${CONFIG.ICON_SIZE}" class="s" style="display: block;">
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding-top: 8px;">
+            <span style="font-size: 11px; color: #666666;">AI-Native Engineering Company</span>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>`;
+      }
+
+      // Update preview
+      function updatePreview() {
+        preview.innerHTML = generateSignature();
+      }
+
+      // Copy to clipboard
+      async function copySignature() {
+        // Generate fresh HTML and minify it
+        const html = minifyHTML(generateSignature());
+        // Generate proper plain text version
+        const plainText = generatePlainText();
+
+        try {
+          // Primary method: ClipboardItem API with both HTML and plain text
+          const htmlBlob = new Blob([html], { type: 'text/html' });
+          const textBlob = new Blob([plainText], { type: 'text/plain' });
+          const data = [
+            new ClipboardItem({
+              'text/html': htmlBlob,
+              'text/plain': textBlob,
+            }),
+          ];
+          await navigator.clipboard.write(data);
+          showCopySuccess();
+        } catch (err) {
+          // Fallback for Firefox: execCommand
+          try {
+            const tempContainer = document.createElement('div');
+            tempContainer.innerHTML = html;
+            tempContainer.style.position = 'fixed';
+            tempContainer.style.left = '-9999px';
+            tempContainer.contentEditable = 'true';
+            document.body.appendChild(tempContainer);
+
+            const range = document.createRange();
+            range.selectNodeContents(tempContainer);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            document.execCommand('copy');
+            document.body.removeChild(tempContainer);
+            selection.removeAllRanges();
+
+            showCopySuccess();
+          } catch (fallbackErr) {
+            alert('Failed to copy. Please try using Chrome, Edge, or Safari.');
+          }
+        }
+      }
+
+      function showCopySuccess() {
+        const span = copyBtn.querySelector('span');
+        const svg = copyBtn.querySelector('svg');
+        span.textContent = CONFIG.UI_TEXT.COPY_SUCCESS;
+        svg.innerHTML = '<polyline points="20 6 9 17 4 12"></polyline>'; // Checkmark
+        copyBtn.classList.add('success');
+        setTimeout(() => {
+          span.textContent = CONFIG.UI_TEXT.COPY_BUTTON;
+          svg.innerHTML =
+            '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
+          copyBtn.classList.remove('success');
+        }, CONFIG.UI_TEXT.COPY_SUCCESS_DURATION);
+      }
+
+      // Dark mode toggle
+      const previewCard = document.querySelector('.preview-card');
+      let isDarkMode = false;
+
+      function toggleTheme() {
+        isDarkMode = !isDarkMode;
+        if (isDarkMode) {
+          previewCard.classList.add('preview-dark');
+          iconSun.style.display = 'none';
+          iconMoon.style.display = 'block';
+        } else {
+          previewCard.classList.remove('preview-dark');
+          iconSun.style.display = 'block';
+          iconMoon.style.display = 'none';
+        }
+      }
+
+      // Format phone input as you type
+      phoneInput.addEventListener('input', (e) => {
+        const value = e.target.value;
+        const formatter = new libphonenumber.AsYouType();
+        const formatted = formatter.input(value);
+        e.target.value = formatted;
+        updatePreview();
+      });
+
+      // Event listeners
+      nameInput.addEventListener('input', updatePreview);
+      jobInput.addEventListener('input', updatePreview);
+      copyBtn.addEventListener('click', copySignature);
+      helpBtn.addEventListener('click', () => modal.classList.add('active'));
+      closeModalBtn.addEventListener('click', () => modal.classList.remove('active'));
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('active');
+      });
+      btnThemeToggle.addEventListener('click', toggleTheme);
+
+      // Initialize
+      updatePreview();
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/libphonenumber-js@1.10.14/bundle/libphonenumber-min.js"></script>
+  </body>
+</html>
