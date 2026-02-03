@@ -22,6 +22,7 @@ jobs:
           mkdir -p deploy
           cp index.html deploy/
           cp -r images deploy/
+          cp -r favicon deploy/
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
